@@ -39,7 +39,6 @@ describe('UsersController', () => {
   it('test findOne user', async () => {
     const userId = "1";
     const rest = await controller.findOne(userId);
-    console.log(rest);
     expect(service.findOne).toHaveBeenCalledWith(userId);
   });
 

@@ -8,7 +8,7 @@ export class HealthcheckService {
   async isDatabaseHealthy(): Promise<boolean> {
     try {
       const res = JSON.stringify(await this.dataSource.query('SELECT 1'));
-      console.log('res query datasource ', res);
+     
       return true;
     } catch (error) {
       return false;

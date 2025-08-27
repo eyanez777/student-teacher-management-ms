@@ -26,7 +26,6 @@ describe('HealthcheckController', () => {
     const status = { status: 'ok', db: 'online' };
     jest.spyOn(service, 'check').mockResolvedValue(status);
     const result = await controller.check();
-    console.log('result', result);
     expect(result).toEqual(`Service is ${status.status}. Database is ${status.db}`);
   });
 });
