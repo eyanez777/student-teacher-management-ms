@@ -1,0 +1,102 @@
+{
+  "info": {
+    "name": "Student Teacher Management API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth - Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"admin@test.com\",\n  \"password\": \"Admin123\"\n}"
+        },
+        "url": { "raw": "http://localhost:3000/auth/login", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["auth", "login"] }
+      }
+    },
+    {
+      "name": "Users - Get All (admin)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": { "raw": "http://localhost:3000/users", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["users"] }
+      }
+    },
+    {
+      "name": "Users - Get Profile (alumno)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": { "raw": "http://localhost:3000/users/me", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["users", "me"] }
+      }
+    },
+    {
+      "name": "Users - Get My Courses (alumno)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": { "raw": "http://localhost:3000/users/me/courses", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["users", "me", "courses"] }
+      }
+    },
+    {
+      "name": "Users - Change Password (admin)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"password\": \"NuevaPass123\"\n}"
+        },
+        "url": { "raw": "http://localhost:3000/users/1/password", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["users", "1", "password"] }
+      }
+    },
+    {
+      "name": "Courses - Get All (admin)",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": { "raw": "http://localhost:3000/courses", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["courses"] }
+      }
+    },
+    {
+      "name": "Users - Add Course to User (admin)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"courseId\": 2\n}"
+        },
+        "url": { "raw": "http://localhost:3000/users/2/courses", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["users", "2", "courses"] }
+      }
+    },
+    {
+      "name": "Users - Remove Course from User (admin)",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": { "raw": "http://localhost:3000/users/2/courses/2", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["users", "2", "courses", "2"] }
+      }
+    }
+  ]
+}

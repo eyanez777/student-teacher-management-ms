@@ -1,0 +1,26 @@
+module.exports = {
+  moduleFileExtensions: ['js', 'json', 'ts'],
+  rootDir: '.',
+  testRegex: '.*\\.spec\\.ts$',
+  transform: {
+    '^.+\\.(t|j)s$': 'ts-jest',
+  },
+  collectCoverageFrom: [  'src/**/*.(t|j)s',
+  '!src/main.ts',
+  '!src/app.module.ts',
+  '!src/seed.ts',
+  '!src/config/**',
+  '!src/**/**.guard.ts',
+  '!src/**/**.strategy.ts'],
+  coverageDirectory: './coverage',
+  testEnvironment: 'node',
+    testPathIgnorePatterns: [
+      '/node_modules/',
+      '/test/e2e/',
+      '\\.e2e-spec\\.ts$',
+      'src/main.ts',
+      'src/app.module.ts',
+      'src/seed.ts',
+      'src/config/',
+    ],
+};

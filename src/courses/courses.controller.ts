@@ -1,31 +1,50 @@
-import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
+
+import { Controller, Get, Post, Body, Param, Put, Delete, UseGuards, Request, UsePipes, ValidationPipe } from '@nestjs/common';
 import { CoursesService } from './courses.service';
+import { CreateCourseDto } from './dto/create-course.dto';
+import { UpdateCourseDto } from './dto/update-course.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
 
 @Controller('courses')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class CoursesController {
   constructor(private readonly coursesService: CoursesService) {}
 
+  // Solo admin puede ver todos los cursos
   @Get()
+  @Roles('admin')
   findAll() {
     return this.coursesService.findAll();
   }
 
+  // Solo admin puede ver cualquier curso por id
   @Get(':id')
+  @Roles('admin')
   findOne(@Param('id') id: string) {
     return this.coursesService.findOne(Number(id));
   }
 
+  // Solo admin puede crear cursos
   @Post()
-  create(@Body() body: any) {
+  @Roles('admin')
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  create(@Body() body: CreateCourseDto) {
     return this.coursesService.create(body);
   }
 
+  // Solo admin puede actualizar cursos
   @Put(':id')
-  update(@Param('id') id: string, @Body() body: any) {
+  @Roles('admin')
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  update(@Param('id') id: string, @Body() body: UpdateCourseDto) {
     return this.coursesService.update(Number(id), body);
   }
 
+  // Solo admin puede eliminar cursos
   @Delete(':id')
+  @Roles('admin')
   remove(@Param('id') id: string) {
     return this.coursesService.remove(Number(id));
   }
