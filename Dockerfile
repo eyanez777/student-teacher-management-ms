@@ -1,5 +1,8 @@
 # Dockerfile para NestJS + PostgreSQL
-FROM node:20-alpine
+FROM node:20.12.2-alpine
+
+# Update package lists and upgrade packages to fix vulnerabilities
+RUN apk update && apk upgrade --no-cache
 
 # Crear directorio de trabajo
 WORKDIR /usr/src/app
