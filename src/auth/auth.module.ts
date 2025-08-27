@@ -4,7 +4,7 @@ import { UsersModule } from '../components/users/users.module';
 
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { JwtStrategy } from './jwt.strategy';
+import { JwtStrategy } from '../utils/jwt.strategy';
 
 @Module({
   imports: [UsersModule, JwtModule.register({ secret: 'jwt_secret', signOptions: { expiresIn: '1h' } })],
