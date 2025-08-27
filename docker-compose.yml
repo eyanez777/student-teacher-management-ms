@@ -1,0 +1,34 @@
+version: '3.8'
+services:
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: one_rest_api
+      POSTGRES_USER: one_api
+      POSTGRES_PASSWORD: 123456
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  app:
+    build: .
+    command: npm run start:prod
+    ports:
+      - '3000:3000'
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USERNAME: one_api
+      DB_PASSWORD: 123456
+      DB_DATABASE: one_rest_api
+      DB_TYPE: postgres
+      DB_AUTO_LOAD_ENTITIES: 'true'
+      DB_SYNCHRONIZE: 'true'
+      JWT_SECRET: supersecreto
+    depends_on:
+      - db
+    volumes:
+      - .:/usr/src/app
+volumes:
+  pgdata:

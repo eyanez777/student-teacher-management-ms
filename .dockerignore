@@ -1,0 +1,11 @@
+node_modules
+dist
+coverage
+.env
+.git
+.gitignore
+Dockerfile
+docker-compose.yml
+README.md
+SQL_REPORT.md
+COVERAGE_REPORT.md
