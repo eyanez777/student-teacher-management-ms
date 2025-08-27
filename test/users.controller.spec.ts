@@ -30,6 +30,19 @@ describe('UsersController', () => {
     expect(controller).toBeDefined();
   });
 
+  it('test de create user', async () => {
+    const createUserDto = { email: 'test@mail.com', password: '1234', name: 'Test User' };
+    await controller.create(createUserDto);
+    expect(service.create).toHaveBeenCalledWith(createUserDto);
+  });
+
+  it('test findOne user', async () => {
+    const userId = "1";
+    const rest = await controller.findOne(userId);
+    console.log(rest);
+    expect(service.findOne).toHaveBeenCalledWith(userId);
+  });
+
   it('should call findAll', async () => {
     await controller.findAll();
     expect(service.findAll).toHaveBeenCalled();

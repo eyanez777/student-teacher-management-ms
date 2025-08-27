@@ -45,7 +45,7 @@ describe('UsersService', () => {
   });
 
   it('should call findOne', async () => {
-    await service.findOne(1);
+    await service.findOne("1");
     expect(repo.findOne).toHaveBeenCalledWith({ where: { id: 1 }, relations: ['courses'] });
   });
 

@@ -53,7 +53,7 @@ export class UsersController {
   @Get(':id')
   @Roles('admin')
   findOne(@Param('id') id: string) {
-    return this.usersService.findOne(Number(id));
+    return this.usersService.findOne(id);
   }
 
   // Solo admin puede crear usuarios

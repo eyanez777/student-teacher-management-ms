@@ -11,7 +11,8 @@ module.exports = {
   '!src/seed.ts',
   '!src/config/**',
   '!src/**/**.guard.ts',
-  '!src/**/**.strategy.ts'],
+  '!src/**/**.strategy.ts',
+   '!src/**/**.module.ts'],
   coverageDirectory: './coverage',
   testEnvironment: 'node',
     testPathIgnorePatterns: [

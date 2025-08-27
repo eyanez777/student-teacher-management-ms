@@ -15,8 +15,8 @@ export class UsersService {
     return this.usersRepository.find({ relations: ['courses'] });
   }
 
-  findOne(id: number) {
-    return this.usersRepository.findOne({ where: { id }, relations: ['courses'] });
+  findOne(id: string) {
+    return this.usersRepository.findOne({ where: { id: parseInt(id) }, relations: ['courses'] });
   }
 
   async findByEmail(email: string) {
