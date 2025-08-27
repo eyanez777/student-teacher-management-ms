@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { User } from '../entity/user.entity';
+import { User } from '../../entity/user.entity';
+import { hashPassword } from '../../utils/hash.util';
 
 @Injectable()
 export class UsersService {
@@ -25,8 +26,7 @@ export class UsersService {
   async create(data: Partial<User>) {
     // Encriptar la contraseña antes de guardar
     if (data.password) {
-      const bcrypt = await import('bcryptjs');
-      data.password = await bcrypt.hash(data.password, 10);
+      data.password = await hashPassword(data.password, 10);
     }
     const user = this.usersRepository.create(data);
     return this.usersRepository.save(user);
@@ -41,8 +41,7 @@ export class UsersService {
   }
 
   async changePassword(id: number, password: string) {
-    const bcrypt = await import('bcryptjs');
-    const hash = await bcrypt.hash(password, 10);
+    const hash = await hashPassword(password, 10);
     await this.usersRepository.update(id, { password: hash });
     return { message: 'Contraseña actualizada correctamente' };
   }
