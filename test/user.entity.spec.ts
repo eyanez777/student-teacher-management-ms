@@ -8,7 +8,7 @@ describe('User Entity', () => {
     user.password = '1234';
     user.name = 'Test';
     user.role = UserRole.ALUMNO; // Aseguramos que el rol es ALUMNO por defecto
-    console.log(user.role)
+    
     expect(user.role).toBe(UserRole.ALUMNO);
   });
 

@@ -1,3 +1,4 @@
+
 import { Test, TestingModule } from '@nestjs/testing';
 import { HealthcheckController } from '../src/components/healthcheck/healthcheck.controller';
 import { HealthcheckService } from '../src/components/healthcheck/healthcheck.service';
@@ -20,6 +21,11 @@ describe('HealthcheckController', () => {
 
   it('should be defined', () => {
     expect(controller).toBeDefined();
+  });
+
+    it('should handle error from service', async () => {
+    jest.spyOn(service, 'check').mockRejectedValue(new Error('DB down'));
+    await expect(controller.check()).rejects.toThrow('DB down');
   });
 
   it('should return healthcheck status from service', async () => {

@@ -1,4 +1,5 @@
 
+
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from '../src/components/users/users.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -39,6 +40,13 @@ describe('UsersService', () => {
     expect(service).toBeDefined();
   });
 
+    it('should add course to user with no courses array', async () => {
+    repo.findOne.mockResolvedValue({ id: 1 });
+    repo.save.mockResolvedValue({});
+    const result = await service.addCourse(1, 2);
+    expect(result).toEqual({ message: 'Curso agregado al usuario' });
+  });
+
   it('should call findAll', async () => {
     await service.findAll();
     expect(repo.find).toHaveBeenCalledWith({ relations: ['courses'] });
@@ -64,18 +72,26 @@ describe('UsersService', () => {
   });
 
   it('should call update', async () => {
-    await service.update(1, { name: 'Test' });
-    expect(repo.update).toHaveBeenCalledWith(1, { name: 'Test' });
+    await service.update("1", { name: 'Test' });
+    expect(repo.update).toHaveBeenCalledWith("1", { name: 'Test' });
   });
 
   it('should call remove', async () => {
-    await service.remove(1);
-    expect(repo.delete).toHaveBeenCalledWith(1);
+    await service.remove("1");
+    expect(repo.delete).toHaveBeenCalledWith("1");
+  });
+
+  it('should call removeCourse', async () => {
+    const mock = { id: "1", courses: [{ id: 2 }] };
+    repo.findOne.mockResolvedValue(mock);
+    const res = await service.removeCourse("1", 2);
+    console.log('res log',res);
+    expect(repo.findOne).toHaveBeenCalledWith({ where: { id: 1 }, relations: ['courses'] });
   });
 
   it('should call changePassword', async () => {
     jest.spyOn(repo, 'update').mockResolvedValue({});
-    const result = await service.changePassword(1, 'newpass');
+    const result = await service.changePassword("1", 'newpass');
     expect(repo.update).toHaveBeenCalled();
     expect(result).toEqual({ message: 'Contraseña actualizada correctamente' });
   });

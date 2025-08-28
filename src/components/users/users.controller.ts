@@ -69,13 +69,13 @@ export class UsersController {
   @Roles('admin')
   @UsePipes(new ValidationPipe({ whitelist: true }))
   update(@Param('id') id: string, @Body() body: UpdateUserDto) {
-    return this.usersService.update(Number(id), body);
+    return this.usersService.update(id, body);
   }
 
   // Solo admin puede eliminar usuarios
   @Delete(':id')
   @Roles('admin')
   remove(@Param('id') id: string) {
-    return this.usersService.remove(Number(id));
+    return this.usersService.remove(id);
   }
 }

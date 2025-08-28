@@ -32,15 +32,15 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
-  update(id: number, data: Partial<User>) {
+  async update(id: string, data: Partial<User>) {
     return this.usersRepository.update(id, data);
   }
 
-  remove(id: number) {
+  async remove(id: string) {
     return this.usersRepository.delete(id);
   }
 
-  async changePassword(id: number, password: string) {
+  async changePassword(id: string, password: string) {
     const hash = await hashPassword(password, 10);
     await this.usersRepository.update(id, { password: hash });
     return { message: 'Contraseña actualizada correctamente' };
@@ -58,8 +58,8 @@ export class UsersService {
     return { message: 'Curso agregado al usuario' };
   }
 
-  async removeCourse(userId: number, courseId: number) {
-    const user = await this.usersRepository.findOne({ where: { id: userId }, relations: ['courses'] });
+  async removeCourse(userId: string, courseId: number) {
+    const user = await this.usersRepository.findOne({ where: { id: parseInt(userId) }, relations: ['courses'] });
     if (!user) return { message: 'Usuario no encontrado' };
     user.courses = user.courses.filter(c => c.id !== courseId);
     await this.usersRepository.save(user);
