@@ -86,7 +86,7 @@ export class UsersController {
 
     try {
       const resp = await this.usersService.create(body);
-      console.log('Usuario creado:', resp);
+     
       return {
         status: 'success',
         code: 'USER_CREATED',

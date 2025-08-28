@@ -26,6 +26,15 @@ export class CoursesController {
     return this.coursesService.findOne(Number(id));
   }
 
+  @Put(':id/users/')
+  @Roles('admin')
+ assignUserToCourse(
+    @Param('id') id: string,
+    @Body() body: [],
+  ) {
+    return this.coursesService.addUserToCourse(Number(id), body);
+  }
+
   // Solo admin puede crear cursos
   @Post()
   @Roles('admin')

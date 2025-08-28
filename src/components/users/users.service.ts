@@ -36,12 +36,10 @@ export class UsersService {
     }
     // Encriptar la contraseña antes de guardar
 
-    console.log('data en userservice ---',data)
     if (data.password) {
       data.password = await hashPassword(data.password, 10);
     }
     const user = this.usersRepository.create(data);
-    console.log('user en userservice ---',user)
     return this.usersRepository.save(user);
   }
   catch (error) {

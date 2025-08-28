@@ -85,7 +85,7 @@ describe('UsersService', () => {
     const mock = { id: "1", courses: [{ id: 2 }] };
     repo.findOne.mockResolvedValue(mock);
     const res = await service.removeCourse("1", 2);
-    console.log('res log',res);
+ 
     expect(repo.findOne).toHaveBeenCalledWith({ where: { id: 1 }, relations: ['courses'] });
   });
 
