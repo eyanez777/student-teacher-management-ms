@@ -4,6 +4,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  
   const config = new DocumentBuilder()
     .setTitle('Student Teacher Management API')
     .setDescription('API para gestión de usuarios y cursos')
@@ -12,7 +13,10 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
-  
+  app.enableCors({
+    origin: true,
+    credentials: true
+  });
   await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();
