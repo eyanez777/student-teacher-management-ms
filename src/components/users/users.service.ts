@@ -24,12 +24,29 @@ export class UsersService {
   }
 
   async create(data: Partial<User>) {
+
+    try{
+    //primero buscar si existe el correo
+    if (!data?.email) {
+      throw new Error('El correo es requerido');
+    }
+    const existingUser = await this.findByEmail(data.email);
+    if (existingUser) {
+      return Promise.reject(new Error('El correo ya está en uso'));
+    }
     // Encriptar la contraseña antes de guardar
+
+    console.log('data en userservice ---',data)
     if (data.password) {
       data.password = await hashPassword(data.password, 10);
     }
     const user = this.usersRepository.create(data);
+    console.log('user en userservice ---',user)
     return this.usersRepository.save(user);
+  }
+  catch (error) {
+    return Promise.reject(new Error('Error al crear el usuario', error));
+  }
   }
 
   async update(id: string, data: Partial<User>) {
@@ -65,4 +82,8 @@ export class UsersService {
     await this.usersRepository.save(user);
     return { message: 'Curso eliminado del usuario' };
   }
-}
+
+  async findById(id: number) {
+    return this.usersRepository.findOne({ where: { id }, relations: ['courses'] });
+  }
+  }

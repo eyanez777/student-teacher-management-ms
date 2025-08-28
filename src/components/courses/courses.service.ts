@@ -23,8 +23,10 @@ export class CoursesService {
     return this.coursesRepository.save(course);
   }
 
-  update(id: number, data: Partial<Course>) {
-    return this.coursesRepository.update(id, data);
+  async update(id: number, data: Partial<Course>) {
+    const res = await this.coursesRepository.update(id, data);
+    console.log(res);
+    return 
   }
 
   remove(id: number) {

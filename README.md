@@ -1,3 +1,23 @@
+## Asignar curso a usuario
+
+**POST** `/users/:id/courses/:courseId`
+
+Asigna un curso a un usuario (solo admin, requiere JWT).
+
+**Parámetros:**
+- `id` (path): ID del usuario
+- `courseId` (path): ID del curso
+
+**Respuesta exitosa:**
+```json
+{
+  "message": "Curso agregado al usuario"
+}
+```
+
+**Errores posibles:**
+- Usuario no encontrado
+- El usuario ya está inscrito en este curso
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>

@@ -1,6 +1,7 @@
 
 
 
+
 import { Controller, Get, Post, Body, Param, Put, Delete, UseGuards, Request } from '@nestjs/common';
 import { UsePipes, ValidationPipe } from '@nestjs/common';
 import { UsersService } from './users.service';
@@ -9,10 +10,30 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { RolesGuard } from '../../guards/roles.guard';
 import { Roles } from '../../decorators/roles.decorator';
+import { ApiOperation, ApiResponse, ApiTags, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 
+@ApiTags('users')
 @Controller('users')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class UsersController {
+  /**
+   * Asigna un curso a un usuario (solo admin)
+   */
+  @Post(':id/courses/:courseId')
+  @Roles('admin')
+  @ApiOperation({ summary: 'Asignar un curso a un usuario' })
+  @ApiBearerAuth()
+  @ApiParam({ name: 'id', type: 'string', description: 'ID del usuario' })
+  @ApiParam({ name: 'courseId', type: 'string', description: 'ID del curso' })
+  @ApiResponse({ status: 200, description: 'Curso asignado correctamente.' })
+  @ApiResponse({ status: 404, description: 'Usuario o curso no encontrado.' })
+  async assignCourseToUser(
+    @Param('id') id: string,
+    @Param('courseId') courseId: string,
+  ) {
+    // addCourse espera números
+    return this.usersService.addCourse(Number(id), Number(courseId));
+  }
   constructor(private readonly usersService: UsersService) {}
 
   // Solo admin puede ver todos los usuarios
@@ -60,8 +81,22 @@ export class UsersController {
   @Post()
   @Roles('admin')
   @UsePipes(new ValidationPipe({ whitelist: true }))
-  create(@Body() body: CreateUserDto) {
-    return this.usersService.create(body);
+  async create(@Body() body: CreateUserDto) {
+
+
+    try {
+      const resp = await this.usersService.create(body);
+      console.log('Usuario creado:', resp);
+      return {
+        status: 'success',
+        code: 'USER_CREATED',
+        payload: { id: resp.id },
+      };
+    } catch (error) {
+      console.log('Error al crear usuario controller:', error);
+      return { error: 'Error al crear usuario', message: error.message };
+    }
+    
   }
 
   // Solo admin puede actualizar usuarios
