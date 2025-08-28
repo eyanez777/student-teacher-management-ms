@@ -22,31 +22,22 @@ export class CoursesService {
     return this.coursesRepository.findOne({ where: { id }, relations: ['users'] });
   }
   async addUserToCourse(courseId: number, body: any) {
-    let users: User[] = [];
-    let { userIds } = body;
+    const { userIds } = body;
     const course = await this.coursesRepository.findOne({ where: { id: courseId }, relations: ['users'] });
-   
-    
-    for (const value of userIds) {
-      const user = await this.usersRepository.findOne({ where: { id: value } });
-      if (course?.users.some((u: User) => u.id === user?.id)) {
-        console.log(`User with id ${value} is already assigned to this course.`);
-
-      } else if (user && user.id !== undefined) {
-        users.push({...user});
-        console.log('User found:', user);
-      } else {
-        console.log(`User with id ${value} not found.`);
-      }
-    }
-    
     if (!course) {
       throw new Error('Course not found');
     }
 
-   course.users.push(...users);
-   const respSave = await this.coursesRepository.save(course);
-   return respSave;
+    // Buscar todos los usuarios que existen en userIds
+    const users = await this.usersRepository.findByIds(userIds);
+    
+    // Actualizar la relación: solo los usuarios en el array quedarán asignados
+    course.users = users;
+    const respSave = await this.coursesRepository.save(course);
+    return {
+      payload: respSave,
+      message: 'Relación de usuarios actualizada para el curso',
+    };
   }
 
   create(data: Partial<Course>) {

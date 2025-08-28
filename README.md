@@ -1,3 +1,30 @@
+## Actualizar usuarios de un curso
+
+**PUT** `/courses/:courseId/users`
+
+Actualiza la relación de usuarios asignados a un curso. Solo los IDs enviados quedarán asignados (los no enviados serán removidos del curso).
+
+**Parámetros:**
+- `courseId` (path): ID del curso
+- `userIds` (body, array de números): IDs de los usuarios a asignar
+
+**Body ejemplo:**
+```json
+{
+  "userIds": [1, 2, 3]
+}
+```
+
+**Respuesta exitosa:**
+```json
+{
+  "payload": { /* datos del curso actualizado */ },
+  "message": "Relación de usuarios actualizada para el curso"
+}
+```
+
+**Errores posibles:**
+- Course not found
 ## Asignar curso a usuario
 
 **POST** `/users/:id/courses/:courseId`

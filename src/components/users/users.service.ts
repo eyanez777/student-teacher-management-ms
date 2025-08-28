@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from '../../entity/user.entity';
+import { Course } from '../../entity/course.entity';
 import { hashPassword } from '../../utils/hash.util';
 
 @Injectable()
@@ -9,6 +10,8 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    @InjectRepository(Course)
+    private coursesRepository: Repository<Course>,
   ) {}
 
   findAll() {
@@ -61,16 +64,19 @@ export class UsersService {
     return { message: 'Contraseña actualizada correctamente' };
   }
 
-  async addCourse(userId: number, courseId: number) {
+  async addCourse(userId: number, courseIds: number[]) {
     const user = await this.usersRepository.findOne({ where: { id: userId }, relations: ['courses'] });
     if (!user) return { message: 'Usuario no encontrado' };
-    if (!user.courses) user.courses = [];
-    if (user.courses.some(c => c.id === courseId)) {
-      return { message: 'El usuario ya está inscrito en este curso' };
-    }
-    user.courses.push({ id: courseId } as any);
-    await this.usersRepository.save(user);
-    return { message: 'Curso agregado al usuario' };
+
+    // Buscar todos los cursos que existen en courseIds usando el repositorio tipado
+    const courses = courseIds.length > 0
+      ? await this.coursesRepository.findByIds(courseIds)
+      : [];
+
+    user.courses = courses;
+    const resp = await this.usersRepository.save(user);
+   
+    return {payload:resp, message: 'Relación de cursos actualizada para el usuario' };
   }
 
   async removeCourse(userId: string, courseId: number) {

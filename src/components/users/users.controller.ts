@@ -16,25 +16,20 @@ import { ApiOperation, ApiResponse, ApiTags, ApiBearerAuth, ApiParam } from '@ne
 @Controller('users')
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class UsersController {
+  constructor(private readonly usersService: UsersService) {}
   /**
    * Asigna un curso a un usuario (solo admin)
    */
-  @Post(':id/courses/:courseId')
+  @Put(':id/courses/')
   @Roles('admin')
-  @ApiOperation({ summary: 'Asignar un curso a un usuario' })
-  @ApiBearerAuth()
-  @ApiParam({ name: 'id', type: 'string', description: 'ID del usuario' })
-  @ApiParam({ name: 'courseId', type: 'string', description: 'ID del curso' })
-  @ApiResponse({ status: 200, description: 'Curso asignado correctamente.' })
-  @ApiResponse({ status: 404, description: 'Usuario o curso no encontrado.' })
   async assignCourseToUser(
     @Param('id') id: string,
-    @Param('courseId') courseId: string,
+    @Body() body: { courseIds: number[] },
   ) {
     // addCourse espera números
-    return this.usersService.addCourse(Number(id), Number(courseId));
+    return this.usersService.addCourse(Number(id), body.courseIds);
   }
-  constructor(private readonly usersService: UsersService) {}
+  
 
   // Solo admin puede ver todos los usuarios
   @Get()
@@ -82,16 +77,13 @@ export class UsersController {
   @Roles('admin')
   @UsePipes(new ValidationPipe({ whitelist: true }))
   async create(@Body() body: CreateUserDto) {
-
-
     try {
       const resp = await this.usersService.create(body);
-     
-      return {
-        status: 'success',
-        code: 'USER_CREATED',
-        payload: { id: resp.id },
-      };
+     const { password, ...user } = resp;
+     return {
+       status: 'success',
+       payload: user,
+     };
     } catch (error) {
       console.log('Error al crear usuario controller:', error);
       return { error: 'Error al crear usuario', message: error.message };
