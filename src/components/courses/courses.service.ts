@@ -59,16 +59,15 @@ export class CoursesService {
     const res = await this.coursesRepository.update(id, data);
     let courseBeforeUpdate;
     
-    if (res.affected === 0) {
+    if (res?.affected === 0) {
       throw new Error('Course not found');
-    }else {
-       courseBeforeUpdate = await this.coursesRepository.findOne({ where: { id } });
-
+    } else {
+      courseBeforeUpdate = await this.coursesRepository.findOne({ where: { id } });
     }
 
     return {
       payload: courseBeforeUpdate,
-      message:'Curso actualizado con exito'
+      message: 'Curso actualizado con exito'
     };
   }
 

@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { CoursesService } from '../src/components/courses/courses.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Course } from '../src/entity/course.entity';
+import { User } from '../src/entity/user.entity';
 
 describe('CoursesService', () => {
   let service: CoursesService;
@@ -21,6 +22,10 @@ describe('CoursesService', () => {
             update: jest.fn(),
             delete: jest.fn(),
           },
+        },
+        {
+          provide: getRepositoryToken(User),
+          useValue: {},
         },
       ],
     }).compile();
