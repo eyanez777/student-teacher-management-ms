@@ -1,8 +1,14 @@
-
-
-
-
-import { Controller, Get, Post, Body, Param, Put, Delete, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Put,
+  Delete,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { UsePipes, ValidationPipe } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -10,7 +16,13 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { RolesGuard } from '../../guards/roles.guard';
 import { Roles } from '../../decorators/roles.decorator';
-import { ApiOperation, ApiResponse, ApiTags, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  ApiBearerAuth,
+  ApiParam,
+} from '@nestjs/swagger';
 
 @ApiTags('users')
 @Controller('users')
@@ -29,7 +41,6 @@ export class UsersController {
     // addCourse espera números
     return this.usersService.addCourse(Number(id), body.courseIds);
   }
-  
 
   // Solo admin puede ver todos los usuarios
   @Get()
@@ -58,7 +69,7 @@ export class UsersController {
   @Roles('alumno', 'admin')
   async getMyCourseDetail(@Request() req, @Param('courseId') courseId: string) {
     const user = await this.usersService.findOne(req.user.userId);
-    const course = user?.courses?.find(c => c.id === Number(courseId));
+    const course = user?.courses?.find((c) => c.id === Number(courseId));
     if (!course) {
       return { message: 'No tienes acceso a este curso' };
     }
@@ -79,16 +90,15 @@ export class UsersController {
   async create(@Body() body: CreateUserDto) {
     try {
       const resp = await this.usersService.create(body);
-     const { password, ...user } = resp;
-     return {
-       status: 'success',
-       payload: user,
-     };
+      const { password, ...user } = resp;
+      return {
+        status: 'success',
+        payload: user,
+      };
     } catch (error) {
       console.log('Error al crear usuario controller:', error);
       return { error: 'Error al crear usuario', message: error.message };
     }
-    
   }
 
   // Solo admin puede actualizar usuarios
