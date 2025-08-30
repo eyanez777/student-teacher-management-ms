@@ -17,11 +17,7 @@ import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { RolesGuard } from '../../guards/roles.guard';
 import { Roles } from '../../decorators/roles.decorator';
 import {
-  ApiOperation,
-  ApiResponse,
   ApiTags,
-  ApiBearerAuth,
-  ApiParam,
 } from '@nestjs/swagger';
 
 @ApiTags('users')

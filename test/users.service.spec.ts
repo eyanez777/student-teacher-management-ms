@@ -1,9 +1,8 @@
-
-
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from '../src/components/users/users.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from '../src/entity/user.entity';
+import { Course } from '../src/entity/course.entity';
 
 
 // Mock para la función utilitaria de hash
@@ -30,6 +29,18 @@ describe('UsersService', () => {
             delete: jest.fn(),
           },
         },
+        {
+          provide: getRepositoryToken(Course),
+          useValue: {
+            find: jest.fn(),
+            findOne: jest.fn(),
+            create: jest.fn(),
+            save: jest.fn(),
+            update: jest.fn(),
+            delete: jest.fn(),
+            findByIds: jest.fn((ids) => ids.map(id => ({ id }))),
+          },
+        },
       ],
     }).compile();
     service = module.get<UsersService>(UsersService);
@@ -43,8 +54,8 @@ describe('UsersService', () => {
     it('should add course to user with no courses array', async () => {
     repo.findOne.mockResolvedValue({ id: 1 });
     repo.save.mockResolvedValue({});
-    const result = await service.addCourse(1, 2);
-    expect(result).toEqual({ message: 'Curso agregado al usuario' });
+    const result = await service.addCourse(1, [2]);
+    expect(result).toEqual({ message: 'Relación de cursos actualizada para el usuario',payload:{} });
   });
 
   it('should call findAll', async () => {
@@ -97,22 +108,22 @@ describe('UsersService', () => {
   });
 
   it('should add course to user if not already enrolled', async () => {
-    repo.findOne.mockResolvedValue({ id: 1, courses: [] });
+    repo.findOne.mockResolvedValue({ id: 1, courses: [1] });
     repo.save.mockResolvedValue({});
-    const result = await service.addCourse(1, 2);
+    const result = await service.addCourse(1, [2]);
     expect(repo.save).toHaveBeenCalled();
-    expect(result).toEqual({ message: 'Curso agregado al usuario' });
+    expect(result).toEqual({ message: 'Relación de cursos actualizada para el usuario',payload:{} });
   });
 
   it('should not add course if already enrolled', async () => {
-    repo.findOne.mockResolvedValue({ id: 1, courses: [{ id: 2 }] });
-    const result = await service.addCourse(1, 2);
-    expect(result).toEqual({ message: 'El usuario ya está inscrito en este curso' });
+    repo.findOne.mockResolvedValue({ id: 1, courses: [2] });
+    const result = await service.addCourse(1, [2]);
+    expect(result).toEqual({ message: 'Relación de cursos actualizada para el usuario',payload:undefined });
   });
 
   it('should return not found if user does not exist in addCourse', async () => {
     repo.findOne.mockResolvedValue(undefined);
-    const result = await service.addCourse(1, 2);
+    const result = await service.addCourse(1, [2]);
     expect(result).toEqual({ message: 'Usuario no encontrado' });
   });
 });
