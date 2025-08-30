@@ -121,9 +121,55 @@ describe('UsersService', () => {
     expect(result).toEqual({ message: 'Relación de cursos actualizada para el usuario',payload:undefined });
   });
 
-  it('should return not found if user does not exist in addCourse', async () => {
+
+  it('should call findById and return user', async () => {
+    repo.findOne.mockResolvedValue({ id: 1, courses: [] });
+    const result = await service.findById(1);
+    expect(repo.findOne).toHaveBeenCalledWith({ where: { id: 1 }, relations: ['courses'] });
+    expect(result).toEqual({ id: 1, courses: [] });
+  });
+
+  it('should return undefined if user not found in findById', async () => {
     repo.findOne.mockResolvedValue(undefined);
-    const result = await service.addCourse(1, [2]);
+    const result = await service.findById(999);
+    expect(result).toBeUndefined();
+  });
+
+  it('should handle error in create if email is missing', async () => {
+    await expect(service.create({ password: '1234' })).rejects.toThrow('Error al crear el usuario');
+  });
+
+  it('should handle error in create if email already exists', async () => {
+    repo.findOne.mockResolvedValueOnce({ id: 1, email: 'a@a.com' });
+    await expect(service.create({ email: 'a@a.com', password: '1234' })).rejects.toThrow('El correo ya está en uso');
+  });
+
+  it('should handle error in create if save fails', async () => {
+    repo.findOne.mockResolvedValueOnce(undefined);
+    repo.create.mockImplementation((data) => data);
+    repo.save.mockRejectedValueOnce(new Error('Error al crear el usuario'));
+    await expect(service.create({ email: 'a@a.com', password: '1234' })).rejects.toThrow('Error al crear el usuario');
+  });
+
+  it('should return not found in removeCourse if user does not exist', async () => {
+    repo.findOne.mockResolvedValue(undefined);
+    const result = await service.removeCourse('1', 2);
     expect(result).toEqual({ message: 'Usuario no encontrado' });
   });
+
+  it('should return not found in changePassword if user does not exist', async () => {
+    repo.update.mockRejectedValueOnce(new Error('User not found'));
+    await expect(service.changePassword('1', 'pass')).rejects.toThrow('User not found');
+  });
+
+  it('should handle error in update', async () => {
+    repo.update.mockRejectedValueOnce(new Error('Update error'));
+    await expect(service.update('1', { name: 'Test' })).rejects.toThrow('Update error');
+  });
+
+  it('should handle error in remove', async () => {
+    repo.delete.mockRejectedValueOnce(new Error('Delete error'));
+    await expect(service.remove('1')).rejects.toThrow('Delete error');
+  });
+
 });

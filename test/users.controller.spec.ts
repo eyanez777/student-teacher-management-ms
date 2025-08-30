@@ -4,6 +4,7 @@ import { UsersController } from '../src/components/users/users.controller';
 import { UsersService } from '../src/components/users/users.service';
 import { Repository } from 'typeorm';
 import { User } from 'src/entity/user.entity';
+import { CreateUserDto } from 'src/components/users/dto/create-user.dto';
 
 describe('UsersController', () => {
   let controller: UsersController;
@@ -83,8 +84,9 @@ describe('UsersController', () => {
   });
 
   it('test de create user', async () => {
-    const createUserDto = { email: 'test@mail.com', password: '1234', name: 'Test User' };
-    await controller.create(createUserDto);
+    const createUserDto: CreateUserDto = { email: 'test@mail.com', password: '1234', name: 'Test User' };
+    const resp = await controller.create(createUserDto);
+    console.log('log controller test', resp);
     expect(service.create).toHaveBeenCalledWith(createUserDto);
   });
 
