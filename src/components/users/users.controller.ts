@@ -13,6 +13,7 @@ import { UsePipes, ValidationPipe } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
 import { JwtAuthGuard } from '../../guards/jwt-auth.guard';
 import { RolesGuard } from '../../guards/roles.guard';
 import { Roles } from '../../decorators/roles.decorator';
@@ -25,6 +26,19 @@ import {
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  /**
+   * Cambia la contraseña del usuario autenticado
+   */
+  @Put('me/password')
+  @Roles('admin', 'alumno')
+  async changePassword(@Request() req, @Body() body: ChangePasswordDto) {
+    return this.usersService.changePassword(
+      req.user.userId,
+      body.currentPassword,
+      body.newPassword,
+    );
+  }
   /**
    * Asigna un curso a un usuario (solo admin)
    */
@@ -86,10 +100,10 @@ export class UsersController {
   async create(@Body() body: CreateUserDto) {
     try {
       const resp = await this.usersService.create(body);
-      const { password, ...user } = resp;
+     // const { password, ...user } = resp;
       return {
         status: 'success',
-        payload: user,
+        payload: resp,
       };
     } catch (error) {
       console.log('Error al crear usuario controller:', error);

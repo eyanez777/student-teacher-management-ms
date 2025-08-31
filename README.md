@@ -1,3 +1,29 @@
+## Cambiar contraseña de usuario (autenticado)
+
+**PUT** `/users/me/password`
+
+Cambia la contraseña del usuario autenticado. Requiere JWT y roles `admin` o `alumno`.
+
+**Body ejemplo:**
+```json
+{
+  "currentPassword": "contraseña_actual",
+  "newPassword": "nueva_contraseña_segura"
+}
+```
+
+**Respuesta exitosa:**
+```json
+{
+  "message": "Contraseña actualizada correctamente"
+}
+```
+
+**Errores posibles:**
+- Usuario no encontrado
+- La contraseña actual es incorrecta
+- La nueva contraseña no puede ser igual a la actual
+- La nueva contraseña no cumple con los requisitos de seguridad (mínimo 8 caracteres)
 ## Actualizar usuarios de un curso
 
 **PUT** `/courses/:courseId/users`

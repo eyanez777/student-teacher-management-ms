@@ -86,7 +86,10 @@ describe('UsersController', () => {
   it('test de create user', async () => {
     const createUserDto: CreateUserDto = { email: 'test@mail.com', password: '1234', name: 'Test User' };
     const resp = await controller.create(createUserDto);
-    console.log('log controller test', resp);
+    expect(resp).toEqual({
+      status: 'success',
+      payload: undefined,
+    });
     expect(service.create).toHaveBeenCalledWith(createUserDto);
   });
 

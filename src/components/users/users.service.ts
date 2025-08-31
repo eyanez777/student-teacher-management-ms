@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { User } from '../../entity/user.entity';
 import { Course } from '../../entity/course.entity';
-import { hashPassword } from '../../utils/hash.util';
+import { hashPassword, comparePasswords } from '../../utils/hash.util';
+
 
 @Injectable()
 export class UsersService {
@@ -57,11 +58,31 @@ export class UsersService {
   async remove(id: string) {
     return this.usersRepository.delete(id);
   }
+   //Cambia la contraseña de un usuario, validando la contraseña actual y que la nueva sea diferente.
+  async changePassword(id: string, currentPassword: string, newPassword: string) {
 
-  async changePassword(id: string, password: string) {
-    const hash = await hashPassword(password, 10);
-    await this.usersRepository.update(id, { password: hash });
+    try{
+    const user = await this.usersRepository.findOne({ where: { id: Number(id) } });
+    if (!user) throw new Error('Usuario no encontrado');
+    // Validar contraseña actual
+    const isMatch = await comparePasswords(currentPassword, user.password);
+    if (!isMatch) {
+      throw new Error('La contraseña actual es incorrecta');
+    }
+    // Validar que la nueva contraseña sea diferente
+    const isSame = await comparePasswords(newPassword, user.password);
+    if (isSame) {
+      throw new Error('La nueva contraseña no puede ser igual a la actual');
+    }
+    // Encriptar y guardar
+    const hash = await hashPassword(newPassword, 10);
+    await this.usersRepository.update(Number(id), { password: hash });
     return { message: 'Contraseña actualizada correctamente' };
+  }catch(error){
+    console.log('error en service user ---->', error.message)
+    const { message } = error;
+    throw new Error(`${message}`, error);
+  }
   }
 
   async addCourse(userId: number, courseIds: number[]) {
@@ -70,7 +91,7 @@ export class UsersService {
 
     // Buscar todos los cursos que existen en courseIds usando el repositorio tipado
     const courses = courseIds.length > 0
-      ? await this.coursesRepository.findByIds(courseIds)
+      ? await this.coursesRepository.findBy({ id: In(courseIds) })
       : [];
 
     user.courses = courses;

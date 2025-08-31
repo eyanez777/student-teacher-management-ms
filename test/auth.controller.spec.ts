@@ -7,7 +7,7 @@ describe('AuthController', () => {
   let authService: any;
 
   beforeEach(async () => {
-    authService = { login: jest.fn() };
+    authService = { login: jest.fn(), refreshToken: jest.fn() };
     const module: TestingModule = await Test.createTestingModule({
       controllers: [AuthController],
       providers: [
@@ -27,5 +27,12 @@ describe('AuthController', () => {
     const result = await controller.login({ email: 'test@mail.com', password: '1234' });
     expect(authService.login).toHaveBeenCalledWith('test@mail.com', '1234');
     expect(result).toEqual(loginResult);
+  });
+  it('should call authService.refreshToken and return result', async () => {
+    const refreshResult = { access_token: 'newToken' };
+    authService.refreshToken.mockResolvedValue(refreshResult);
+    const result = await controller.refreshToken({ token: 'oldToken' });
+    expect(authService.refreshToken).toHaveBeenCalledWith('oldToken');
+    expect(result).toEqual(refreshResult);
   });
 });

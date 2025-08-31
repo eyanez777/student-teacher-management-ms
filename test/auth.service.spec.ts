@@ -79,4 +79,27 @@ describe('AuthService', () => {
     usersService.findByEmail.mockResolvedValue(null);
     await expect(service.login('notfound@mail.com', '1234')).rejects.toThrow(UnauthorizedException);
   });
+  it('should refresh token and return new access_token', async () => {
+    const payload = { sub: 1, email: 'test@mail.com', role: 'admin' };
+    jwtService.verify = jest.fn().mockResolvedValue(payload);
+    usersService.findById = jest.fn().mockResolvedValue(mockUser);
+    jwtService.sign = jest.fn().mockResolvedValue('newToken');
+    const result = await service.refreshToken('oldToken');
+    expect(jwtService.verify).toHaveBeenCalledWith('oldToken');
+    expect(usersService.findById).toHaveBeenCalledWith(1);
+    expect(jwtService.sign).toHaveBeenCalledWith({ sub: 1, email: 'test@mail.com', role: 'admin' }, { expiresIn: '5m' });
+    expect(result).toEqual({ access_token: 'newToken' });
+  });
+
+  it('should throw UnauthorizedException if user not found in refreshToken', async () => {
+    const payload = { sub: 1, email: 'test@mail.com', role: 'admin' };
+    jwtService.verify = jest.fn().mockResolvedValue(payload);
+    usersService.findById = jest.fn().mockResolvedValue(null);
+    await expect(service.refreshToken('oldToken')).rejects.toThrow(UnauthorizedException);
+  });
+
+  it('should throw UnauthorizedException if token is invalid in refreshToken', async () => {
+    jwtService.verify = jest.fn().mockRejectedValue(new Error('invalid'));
+    await expect(service.refreshToken('badToken')).rejects.toThrow(UnauthorizedException);
+  });
 });
