@@ -1,3 +1,7 @@
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { v4 as uuidv4 } from 'uuid';
+ 
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../../components/users/users.service';
@@ -41,6 +45,47 @@ export class AuthService {
         role: user.role,
       },
     };
+  }
+
+   async forgotPassword(body: ForgotPasswordDto) {
+    // Buscar usuario por email o phone
+    let user;
+    if (body.email) {
+      user = await this.usersService.findByEmail(body.email);
+    } else if (body.phone) {
+      user = await this.usersService.findByPhone(body.phone);
+    }
+    console.log(user)
+    // if (!user) {
+    //   return { message: 'Usuario no encontrado' };
+    // }
+    // Generar token único y expiración (ej: 15 minutos)
+    const token = uuidv4();
+    const expires = Date.now() + 15 * 60 * 1000;
+    await this.usersService.setResetToken(user.id, token, expires);
+    // Simulación: en desarrollo, mostrar el token; en prod, enviar por email/SMS
+    if (process.env.NODE_ENV !== 'production') {
+      return { message: 'Token de recuperación generado', token, expires };
+    }
+    // Aquí iría la lógica real de envío (email/SMS)
+    return { message: 'Se ha enviado un enlace de recuperación' };
+  }
+
+  async resetPassword(body: ResetPasswordDto) {
+    try{
+    // Buscar usuario por token válido
+    const user = await this.usersService.findByResetToken(body.token);
+    if (!user || !user.resetTokenExpires || user.resetTokenExpires < Date.now()) {
+      return { message: 'Token inválido o expirado' };
+    }
+    // Cambiar contraseña y limpiar token
+    await this.usersService.changePasswordByReset(user.id, body.newPassword);
+    await this.usersService.clearResetToken(user.id);
+    return { message: 'Contraseña restablecida correctamente' };
+  }
+  catch(error){
+    console.log(error);
+  }
   }
 
   async refreshToken(token: string) {

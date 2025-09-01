@@ -12,8 +12,18 @@ export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
+
   @Column({ unique: true })
   email: string;
+
+  @Column({ nullable: true, unique: true })
+  phone?: string;
+
+  @Column({ nullable: true })
+  resetToken?: string;
+
+  @Column({ nullable: true, type: 'bigint' })
+  resetTokenExpires?: number;
 
   @Column()
   password: string;

@@ -30,14 +30,20 @@ export class UsersController {
   /**
    * Cambia la contraseña del usuario autenticado
    */
-  @Put('me/password')
-  @Roles('admin', 'alumno')
-  async changePassword(@Request() req, @Body() body: ChangePasswordDto) {
-    return this.usersService.changePassword(
-      req.user.userId,
-      body.currentPassword,
-      body.newPassword,
-    );
+  @Put(':id/me/password')
+  @Roles('admin')
+  async changePassword(@Param('id') id: string, @Body() body: ChangePasswordDto) {
+
+    try {
+      return this.usersService.changePassword(
+        id,
+        body.currentPassword,
+        body.newPassword,
+      );
+    } catch (error) {
+      console.log('Error al cambiar contraseña:', error);
+     return error
+    }
   }
   /**
    * Asigna un curso a un usuario (solo admin)

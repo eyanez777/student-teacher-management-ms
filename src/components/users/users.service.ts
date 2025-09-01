@@ -1,3 +1,4 @@
+
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
@@ -60,7 +61,7 @@ export class UsersService {
   }
    //Cambia la contraseña de un usuario, validando la contraseña actual y que la nueva sea diferente.
   async changePassword(id: string, currentPassword: string, newPassword: string) {
-
+    console.log(id)
     try{
     const user = await this.usersRepository.findOne({ where: { id: Number(id) } });
     if (!user) throw new Error('Usuario no encontrado');
@@ -69,19 +70,22 @@ export class UsersService {
     if (!isMatch) {
       throw new Error('La contraseña actual es incorrecta');
     }
-    // Validar que la nueva contraseña sea diferente
+    // Validar que la nueva contraseña sea diferente y que la nueva contraseña no este vacia
+    if(!newPassword) throw new Error('La nueva contraseña es requerida');
     const isSame = await comparePasswords(newPassword, user.password);
     if (isSame) {
       throw new Error('La nueva contraseña no puede ser igual a la actual');
     }
     // Encriptar y guardar
     const hash = await hashPassword(newPassword, 10);
-    await this.usersRepository.update(Number(id), { password: hash });
+    const resp = await this.usersRepository.update(Number(id), { password: hash });
+    if(resp.affected === 0) throw new Error ('Error al actualizar la contraseña')
+    
     return { message: 'Contraseña actualizada correctamente' };
   }catch(error){
     console.log('error en service user ---->', error.message)
     const { message } = error;
-    throw new Error(`${message}`, error);
+    return {message: message};
   }
   }
 
@@ -110,5 +114,29 @@ export class UsersService {
 
   async findById(id: number) {
     return this.usersRepository.findOne({ where: { id }, relations: ['courses'] });
+  }
+
+    async findByPhone(phone: string) {
+    return this.usersRepository.findOne({ where: { phone } });
+  }
+
+  async setResetToken(userId: number, token: string, expires: number) {
+    await this.usersRepository.update(userId, { resetToken: token, resetTokenExpires: expires });
+  }
+
+  async findByResetToken(token: string) {
+    return this.usersRepository.findOne({ where: { resetToken: token } });
+  }
+
+  async changePasswordByReset(userId: number, newPassword: string) {
+    console.log('cambiando contraseña para userId:', userId);
+    console.log('nueva contraseña:', newPassword);
+    const hash = await hashPassword(newPassword, 10);
+    console.log('contraseña encriptada:', hash);
+    await this.usersRepository.update(userId, { password: hash });
+  }
+
+  async clearResetToken(userId: number) {
+    await this.usersRepository.update(userId, { resetToken: undefined, resetTokenExpires: undefined });
   }
   }
