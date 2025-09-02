@@ -41,7 +41,7 @@ export class UsersController {
         body.newPassword,
       );
     } catch (error) {
-      console.log('Error al cambiar contraseña:', error);
+      
      return error
     }
   }
@@ -106,13 +106,11 @@ export class UsersController {
   async create(@Body() body: CreateUserDto) {
     try {
       const resp = await this.usersService.create(body);
-     // const { password, ...user } = resp;
       return {
         status: 'success',
         payload: resp,
       };
     } catch (error) {
-      console.log('Error al crear usuario controller:', error);
       return { error: 'Error al crear usuario', message: error.message };
     }
   }

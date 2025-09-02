@@ -1,8 +1,12 @@
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { v4 as uuidv4 } from 'uuid';
- 
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../../components/users/users.service';
 import * as bcrypt from 'bcryptjs';
@@ -47,7 +51,7 @@ export class AuthService {
     };
   }
 
-   async forgotPassword(body: ForgotPasswordDto) {
+  async forgotPassword(body: ForgotPasswordDto) {
     // Buscar usuario por email o phone
     let user;
     if (body.email) {
@@ -55,10 +59,7 @@ export class AuthService {
     } else if (body.phone) {
       user = await this.usersService.findByPhone(body.phone);
     }
-    console.log(user)
-    // if (!user) {
-    //   return { message: 'Usuario no encontrado' };
-    // }
+   
     // Generar token único y expiración (ej: 15 minutos)
     const token = uuidv4();
     const expires = Date.now() + 15 * 60 * 1000;
@@ -72,20 +73,23 @@ export class AuthService {
   }
 
   async resetPassword(body: ResetPasswordDto) {
-    try{
-    // Buscar usuario por token válido
-    const user = await this.usersService.findByResetToken(body.token);
-    if (!user || !user.resetTokenExpires || user.resetTokenExpires < Date.now()) {
-      return { message: 'Token inválido o expirado' };
+    try {
+      // Buscar usuario por token válido
+      const user = await this.usersService.findByResetToken(body.token);
+     
+      if (!user) throw new BadRequestException('Usuario no encontrado');
+      if (!user?.resetTokenExpires || user?.resetTokenExpires < Date.now()) {
+        throw new BadRequestException('Token inválido o expirado');
+      }
+      // Cambiar contraseña y limpiar token
+      await this.usersService.changePasswordByReset(user.id, body.newPassword);
+      await this.usersService.clearResetToken(user.id);
+      return { message: 'Contraseña restablecida correctamente' };
+    } catch (error) {
+      
+      if (error instanceof BadRequestException) throw error;
+      throw new BadRequestException(error.message);
     }
-    // Cambiar contraseña y limpiar token
-    await this.usersService.changePasswordByReset(user.id, body.newPassword);
-    await this.usersService.clearResetToken(user.id);
-    return { message: 'Contraseña restablecida correctamente' };
-  }
-  catch(error){
-    console.log(error);
-  }
   }
 
   async refreshToken(token: string) {
@@ -93,11 +97,14 @@ export class AuthService {
       const payload = await this.jwtService.verify(token);
       const user = await this.usersService.findById(payload.sub);
       if (!user) throw new UnauthorizedException('User not found');
-      const newToken = await this.jwtService.sign({
-        sub: user.id,
-        email: user.email,
-        role: user.role,
-      }, { expiresIn: '5m' });
+      const newToken = await this.jwtService.sign(
+        {
+          sub: user.id,
+          email: user.email,
+          role: user.role,
+        },
+        { expiresIn: '5m' },
+      );
       return { access_token: newToken };
     } catch (error) {
       throw new UnauthorizedException('Invalid token');

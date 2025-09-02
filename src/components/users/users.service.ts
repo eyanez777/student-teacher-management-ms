@@ -61,7 +61,7 @@ export class UsersService {
   }
    //Cambia la contraseña de un usuario, validando la contraseña actual y que la nueva sea diferente.
   async changePassword(id: string, currentPassword: string, newPassword: string) {
-    console.log(id)
+    
     try{
     const user = await this.usersRepository.findOne({ where: { id: Number(id) } });
     if (!user) throw new Error('Usuario no encontrado');
@@ -83,7 +83,7 @@ export class UsersService {
     
     return { message: 'Contraseña actualizada correctamente' };
   }catch(error){
-    console.log('error en service user ---->', error.message)
+    
     const { message } = error;
     return {message: message};
   }
@@ -129,14 +129,13 @@ export class UsersService {
   }
 
   async changePasswordByReset(userId: number, newPassword: string) {
-    console.log('cambiando contraseña para userId:', userId);
-    console.log('nueva contraseña:', newPassword);
     const hash = await hashPassword(newPassword, 10);
-    console.log('contraseña encriptada:', hash);
     await this.usersRepository.update(userId, { password: hash });
   }
 
   async clearResetToken(userId: number) {
-    await this.usersRepository.update(userId, { resetToken: undefined, resetTokenExpires: undefined });
+    const resetToken = ''
+    
+    await this.usersRepository.update(userId, { resetToken: resetToken, resetTokenExpires: null });
   }
   }

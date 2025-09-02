@@ -23,7 +23,7 @@ export class User {
   resetToken?: string;
 
   @Column({ nullable: true, type: 'bigint' })
-  resetTokenExpires?: number;
+  resetTokenExpires?: number | null;
 
   @Column()
   password: string;
